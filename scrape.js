@@ -13,43 +13,53 @@ request('https://news.ycombinator.com/', (error, response, html) => {
 		const total_comments = [];
 		const links = [];
 
-		// Extract titles and links into an array
 		$('.storylink').each((i, el) => {
+			// Extract title
 			const title= $(el).text();
 			titles.push(title);
 
+			// Extract link
 			const link= $(el).attr('href');
 			links.push(link);
 		});
 
-		// Extract users into an array
 		$('.subtext').each((i, el) => {
+			// Extract users
 			const user= $(el).find('.hnuser').text();
 			users.push(user);
 
-			const total_point= $(el).find('.score').text();
+			// Extract total_points
+			var total_point= $(el).find('.score').text();
+			total_point = total_point.match(/[0-9]+/g);
+			total_point = parseInt(total_point, 10);
 			total_points.push(total_point);
+
+			// Extract total_comments
+			var subtext= $(el).text();
+			const hasComment= subtext.match(/(comment)/g);
+			var total_comment = 0;
+			if(hasComment) {
+				// Extract number of comments
+				subtext = subtext.replace(/\s/g, "");
+				subtext = subtext.slice(subtext.length-12);
+				subtext = subtext.match(/[0-9]+/g);
+				total_comment = parseInt(subtext, 10);
+			}
+			total_comments.push(total_comment);
 		});
 
-		// // Extract total_comments into an array
-		// $('.').each((i, el) => {
-		// 	const total_comment= $(el).text();
-		// 	total_comments.push(total_comment);
-		// });
-
+		// Compile into object, push into output array
 		titles.forEach((i, el) => {
 			const inst = new Object();
 
 			inst["title"] = titles[el];
 			inst["user"] = users[el];
 			inst["total_points"] = total_points[el];
-			// inst["total_comments"] = total_comments[el];
+			inst["total_comments"] = total_comments[el];
 			inst["link"] = links[el];
 
 			output.push(inst);
-
 		});
-
 		console.log(output);
 	}
 });
