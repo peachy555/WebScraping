@@ -6,17 +6,50 @@ request('https://news.ycombinator.com/', (error, response, html) => {
 		const $ = cheerio.load(html);
 
 		const output = [];
+
 		const titles = [];
+		const users = [];
+		const total_points = [];
+		const total_comments = [];
+		const links = [];
 
+		// Extract titles and links into an array
 		$('.storylink').each((i, el) => {
-
 			const title= $(el).text();
-
-			// dataset["Title"] = title;
 			titles.push(title);
+
+			const link= $(el).attr('href');
+			links.push(link);
 		});
 
-		console.log(titles);
+		// Extract users into an array
+		$('.subtext').each((i, el) => {
+			const user= $(el).find('.hnuser').text();
+			users.push(user);
 
+			const total_point= $(el).find('.score').text();
+			total_points.push(total_point);
+		});
+
+		// // Extract total_comments into an array
+		// $('.').each((i, el) => {
+		// 	const total_comment= $(el).text();
+		// 	total_comments.push(total_comment);
+		// });
+
+		titles.forEach((i, el) => {
+			const inst = new Object();
+
+			inst["title"] = titles[el];
+			inst["user"] = users[el];
+			inst["total_points"] = total_points[el];
+			// inst["total_comments"] = total_comments[el];
+			inst["link"] = links[el];
+
+			output.push(inst);
+
+		});
+
+		console.log(output);
 	}
 });
